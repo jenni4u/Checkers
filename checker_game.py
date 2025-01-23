@@ -18,6 +18,18 @@ H_KING = 3
 C_KING = 4
 H_CAPTURE = False
 h_capt_moves = []
+
+
+def level_return(board, computer_moves, COMPUTER, level):
+    '''Return computer's next move depending on level of difficulty'''
+    if level == 1:
+        return _choose_move_random(board, computer_moves, COMPUTER)
+    elif level == 2:
+        return _choose_move_greed(board, computer_moves, COMPUTER)
+    elif level == 3:
+        return _choose_move_recursion(board, computer_moves, COMPUTER)
+
+
 def game_start(): #DONE
     '''Initialize board and positions'''
     #Create an 8x8 board
@@ -38,7 +50,7 @@ def game_start(): #DONE
 
     return board
 
-def game_turn(board, h_pawn, h_move):
+def game_turn(board, h_pawn, h_move, level):
     '''Run a turn of the game, with the human move already chosen
     h_pawn = tuple(int,int)
     h_move = tuple(int,int)
@@ -110,7 +122,7 @@ def game_turn(board, h_pawn, h_move):
       if not chosen_move: #If the move is not a second capture move, choose using algorithm
           computer_moves = legal_moves(board,COMPUTER)
           #Function here can be changed to choose the algorithm to choose move
-          c_pawn, c_move = _choose_move_random(board, computer_moves, COMPUTER)
+          c_pawn, c_move = level_return(board, computer_moves, COMPUTER, level)
           print(c_pawn, c_move)
           if c_pawn == -1:
               return

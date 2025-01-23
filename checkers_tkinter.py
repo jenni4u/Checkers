@@ -36,6 +36,7 @@ LEGAL_MOVES = []    # list of possible moves (square) for selected square
 CHOICES = []        # list of square ids that are possible moves
 H_PAWN = (0, 1)     # coordinates of current selected square in (row, col) of matrix
 H_MOVE = (0, 0)     # coordinates of selected move in (row, col) of matrix
+LEVEL = 1           # level of difficulty
 
 # double jump
 JUMP_MOVES = []     # list of possible moves for jumper pawn after a capture
@@ -82,7 +83,7 @@ def find_square(row, col):
 def set_board(board):
     '''Set a board from a matrix of pieces' positions.'''
     
-    global CURRENT, PLAYER1, DARK_SQUARES
+    global CURRENT, PLAYER1, DARK_SQUARES, LEVEL
 
     # clear 
     for l in [PLAYER1, DARK_SQUARES]:
@@ -138,6 +139,7 @@ def set_board(board):
     print("jen's board")
     for row in board:
         print(row)
+    print(LEVEL)
     print("------------------------")
 
 
@@ -209,7 +211,7 @@ def new_game():
     
 def on_click(event):
     '''Handles a left click from the mouse.'''
-    global H_PAWN, H_MOVE, LEGAL_MOVES, CHOICES, CURRENT, JUMP_MOVES, PAWN
+    global H_PAWN, H_MOVE, LEGAL_MOVES, CHOICES, CURRENT, JUMP_MOVES, PAWN, LEVEL
     
     # find [dark square, piece] clicked on
     x = canvas.canvasx(event.x)
@@ -222,8 +224,6 @@ def on_click(event):
     
     # assign clicked square
     square = under[0]
-    
-        
     
    
     if len(under) == 2 and under[1] in PLAYER1:
@@ -260,18 +260,37 @@ def on_click(event):
         for move in LEGAL_MOVES:
             if move[0] == H_MOVE[0] and move[1] == H_MOVE[1]:
                 H_MOVE = move
-        JUMP_MOVES = game_turn(CURRENT, H_PAWN, H_MOVE)
+        JUMP_MOVES = game_turn(CURRENT, H_PAWN, H_MOVE, LEVEL)
         PAWN = H_MOVE[:-1]
 
         set_board(CURRENT)
+
+def level_easy():
+    '''Set level of difficulty to easy.'''
+    global LEVEL
+    LEVEL = 1 
+def level_medium():
+    '''Set level of difficulty to medium.'''
+    global LEVEL
+    LEVEL = 2 
+def level_hard():
+    '''Set level of difficulty to hard.'''
+    global LEVEL
+    LEVEL = 3
         
 # create menu
 menubar = tk.Menu(root)
 gamemenu = tk.Menu(menubar, tearoff = 0)
 gamemenu.add_command(label = 'New Game', command = new_game)
-gamemenu.add_command(label = 'Set Level', command = set_level)
 gamemenu.add_command(label = 'Quit', command = root.quit)
 menubar.add_cascade(label="Game", menu=gamemenu)
+
+levelmenu = tk.Menu(menubar, tearoff = 0)
+levelmenu.add_command(label = 'Easy', command = level_easy)
+levelmenu.add_command(label = 'Medium', command = level_medium)
+levelmenu.add_command(label = 'Hard', command = level_hard)
+menubar.add_cascade(label="Level", menu=levelmenu)
+
     
 
     
