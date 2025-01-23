@@ -269,6 +269,7 @@ def on_click(event):
 menubar = tk.Menu(root)
 gamemenu = tk.Menu(menubar, tearoff = 0)
 gamemenu.add_command(label = 'New Game', command = new_game)
+gamemenu.add_command(label = 'Set Level', command = set_level)
 gamemenu.add_command(label = 'Quit', command = root.quit)
 menubar.add_cascade(label="Game", menu=gamemenu)
     
