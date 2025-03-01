@@ -94,7 +94,6 @@ def game_turn(board, h_pawn, h_move, level):
         #Return if the game is over, no need for a move
         if game_over(board):
             return
-        
         # Move if its the computer's first turn
         if cpu_move_id == 1:
             cpu_move_id = 0
@@ -142,6 +141,9 @@ def game_turn(board, h_pawn, h_move, level):
         for row in board:
             print(row)
         print('------------------------')
+
+        if game_over(board):
+            return
             
 
 def game_turn1(board, h_pawn, h_move, level):
