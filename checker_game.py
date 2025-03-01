@@ -62,12 +62,10 @@ def game_turn(board, h_pawn, h_move, level):
     #Check if it is a capture move
     capture_h = True #Initialization
     while capture_h:
-
         capture_h = False
-        #Check for capture
 
+        #Check for capture
         if len(h_move) == 3:
-            
             jumped_row, jumped_col = h_move[2]
             board[jumped_row][jumped_col] = 0
             h_move = h_move[:2]
@@ -115,11 +113,12 @@ def game_turn(board, h_pawn, h_move, level):
     capture_c = True #initialization
     chosen_move = False #For if it takes
     while capture_c:
-      if chosen_move:
-          capture_c = False
+
       if game_over(board):
           return
-      if not chosen_move: #If the move is not a second capture move, choose using algorithm
+      if chosen_move:
+          capture_c = False
+      else: #If the move is not a second capture move, choose using algorithm
           computer_moves = legal_moves(board,COMPUTER)
           #Function here can be changed to choose the algorithm to choose move
           c_pawn, c_move = level_return(board, computer_moves, COMPUTER, level)
