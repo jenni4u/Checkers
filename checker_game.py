@@ -51,6 +51,100 @@ def game_start(): #DONE
     return board
 
 def game_turn(board, h_pawn, h_move, level):
+    global H_CAPTURE, h_capt_moves # For UI to know if human can play twice
+    #Number of moves each player can play during this turn
+    cpu_move_id = 1
+    H_CAPTURE = False
+    h_capt_moves = []
+    
+#If the move is a capture, the player can play again & the captured piece is removed
+    if len(h_move) == 3:
+        jumped_row, jumped_col = h_move[2]
+        board[jumped_row][jumped_col] = 0
+        h_move = h_move[:2]
+        H_CAPTURE = True
+#Move piece from original pawn position to final position
+    board[h_pawn[0]][h_pawn[1]] = 0
+    if len(h_pawn) == 3:
+        board[h_move[0]][h_move[1]] = H_KING
+    else:
+        board[h_move[0]][h_move[1]] = HUMAN
+        #Upgrade pawn into king if it reached the final row
+        if _isking(board,h_move[0],h_move[1],HUMAN):
+            board[h_move[0]][h_move[1]] = H_KING
+        
+        #Check for additional moves if the move was a capture
+        if H_CAPTURE:
+            pawn = (h_move[0],h_move[1])
+            all_moves = legal_moves(board,HUMAN).get(pawn, [])
+            
+            for move in all_moves:
+                if len(move) == 3:
+                    h_capt_moves.append(move)
+            # If there are any additional captures, return the possible next moves and end the function
+            if len(h_capt_moves) != 0:
+                return h_capt_moves
+            # If there are no additional moves, it is the computer's turn (as if there was no capture)
+            else:
+                H_CAPTURE = False
+    
+    #Choose computer move
+    #System for double capture is that computer_moves will be 1 if it is their first move, and 2 if it isn't
+    while cpu_move_id > 0:
+        #Return if the game is over, no need for a move
+        if game_over(board):
+            return
+        
+        # Move if its the computer's first turn
+        if cpu_move_id == 1:
+            cpu_move_id = 0
+            #Choose a move
+            computer_moves = legal_moves(board,COMPUTER)
+            #Function here can be changed to choose the algorithm to choose move
+            c_pawn, c_move = level_return(board, computer_moves, COMPUTER, level)
+            print(c_pawn, c_move, "first computer move")
+            if c_pawn == -1:
+                return
+        #Move if its the computer's second turn
+        elif cpu_move_id == 2:
+            cpu_move_id = 0
+            #Choose a move
+            pawn = (c_move[0],c_move[1])
+            all_moves = legal_moves(board,COMPUTER).get(pawn, [])
+            new_capt_cpu = [] #new possible moves for cpu
+            for move in all_moves:
+                if len(move) == 3:
+                    new_capt_cpu.append(move)
+            # If there are any additional captures, return the possible next moves and end the function
+            if len(new_capt_cpu) != 0:
+                c_move = level_return(board, new_capt_cpu, COMPUTER, level)
+            # If there are no additional moves, act as if there was no capture
+            else:
+                cpu_move_id = 0
+            
+        #Check if chosen move is a capture
+        if len(c_move) == 3:
+            cpu_move_id = 2
+            jumped_row, jumped_col = c_move[2]
+            board[jumped_row][jumped_col] = 0
+
+        #Move chosen computer piece
+        board[c_pawn[0]][c_pawn[1]] = 0
+        if len(c_pawn) == 3:
+            board[c_move[0]][c_move[1]] = C_KING
+        else:
+            board[c_move[0]][c_move[1]] = COMPUTER
+            #Upgrade pawn into king if it reached the final row
+            if _isking(board, c_move[0], c_move[1], COMPUTER):
+                board[c_move[0]][c_move[1]] = C_KING
+
+        print("julien's board")
+        for row in board:
+            print(row)
+        print('------------------------')
+            
+
+def game_turn1(board, h_pawn, h_move, level):
     '''Run a turn of the game, with the human move already chosen
     h_pawn = tuple(int,int)
     h_move = tuple(int,int)
@@ -104,12 +198,7 @@ def game_turn(board, h_pawn, h_move, level):
             else:
                 break
 
-        
-
-                  
-    
     #Choose computer move
-    
     capture_c = True #initialization
     chosen_move = False #For if it takes
     while capture_c:
@@ -167,7 +256,7 @@ def game_turn(board, h_pawn, h_move, level):
                     
             if chosen_move:
                 break
-     
+
 def _choose_move_random(board,moves,player):
     '''Choose a move for the computer depending on RANDOM or BST or GREED or RECURSION
     Should return a tuple consisting of the initial position of a piece and the final
